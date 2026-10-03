@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="K Finance">
+<meta name="theme-color" content="#0d110f">
+<title>K Finance</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d110f;--card:#151c18;--line:#26302a;--gold:#d9b36c;--tx:#ece7da;--mu:#8d978f;--red:#e0765f;--grn:#7fc29b;--yel:#e8c25a}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--tx);font:15px/1.45 Manrope,system-ui,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(78px + env(safe-area-inset-bottom))}
+.serif{font-family:Fraunces,Georgia,serif}
+.wrap{max-width:560px;margin:0 auto;padding:16px}
+.hide{display:none!important}
+header{display:flex;justify-content:space-between;align-items:flex-end;padding:6px 2px 14px}
+#clk{font:700 34px/1 Fraunces,serif;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+#dt{color:var(--mu);font-size:13px;margin-top:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+.hero{background:linear-gradient(160deg,#1b261f,#121815);border-color:#33402f}
+.lbl{color:var(--mu);font-size:13px}
+.big{font:700 40px/1.1 Fraunces,serif;color:var(--gold);margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.q{font:500 17px/1.5 Fraunces,serif;color:var(--tx)}
+.q button{margin-top:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row b{font-weight:600}.row small{display:block;color:var(--mu);font-size:12px}
+.amt{font:700 16px Fraunces,serif;white-space:nowrap}
+.pos{color:var(--grn)}.neg{color:var(--red)}
+h2{font:700 22px Fraunces,serif;margin:6px 2px 12px}
+h3{font-size:14px;font-weight:800;margin-bottom:6px}
+input,select{width:100%;background:#0f1512;color:var(--tx);border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;margin-bottom:8px;min-height:46px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 16px;background:var(--gold);color:#1a1405;font-weight:800;min-height:44px}
+button.ghost{background:transparent;color:var(--gold);border:1px solid var(--line);padding:8px 12px;min-height:36px;font-weight:600}
+button.x{background:transparent;color:var(--mu);padding:6px 10px;min-height:32px;font-weight:600}
+button.wide{width:100%}
+details summary{list-style:none;cursor:pointer;font-weight:800;color:var(--gold);padding:2px 0}
+details summary::-webkit-details-marker{display:none}
+details[open] summary{margin-bottom:12px}
+.pill{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:6px}
+.p-r{background:#3a1f19;color:var(--red)}.p-y{background:#3a3217;color:var(--yel)}.p-g{background:#173024;color:var(--grn)}
+.bar{height:8px;background:#0f1512;border-radius:9px;overflow:hidden;margin:8px 0 4px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#a98744,var(--gold));border-radius:9px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(13,17,15,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;color:var(--mu);font-size:12px;font-weight:600;padding:8px 2px;border-radius:10px}
+nav button.on{color:var(--gold)}
+nav svg{display:block;margin:0 auto 3px}
+#auth{min-height:100vh;display:flex;align-items:center}
+#auth .wrap{width:100%}
+.pw{position:relative}.pw input{padding-right:50px}
+.pw button{position:absolute;right:3px;top:3px;width:44px;min-height:40px;padding:0;background:none;color:var(--mu);border-radius:10px}
+.lnk{display:block;text-align:center;color:var(--gold);font-weight:600;text-decoration:none;padding:12px 0 2px}
+.err{color:var(--red);font-size:13px;min-height:20px;margin:2px 0 8px}
+#err{color:var(--red);font-size:13px;min-height:20px;margin:2px 0 8px}
+.pb{text-align:center;color:var(--mu);font-size:12px;letter-spacing:.4px;padding:18px 0 4px}.pb b{color:var(--gold);font-weight:600}
+.empty{color:var(--mu);padding:8px 0}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+
+<section id="auth" class="hide"><div class="wrap">
+  <div style="text-align:center;margin-bottom:22px"><div id="logo" style="width:84px;height:84px;margin:0 auto 12px"></div>
+  <h2 style="margin:0">K Finance</h2><p class="lbl">Salary, spending, debts and savings in one place.</p></div>
+  <div class="card" id="login">
+    <input id="em" type="email" placeholder="Email" autocomplete="email">
+    <div class="pw"><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button type="button" class="eye" aria-label="Show password"></button></div>
+    <div id="err" class="err"></div>
+    <button class="wide" id="bin">Log in</button>
+    <button class="ghost wide" id="brs" style="margin-top:8px">Forgot password</button>
+    <a class="lnk" href="#signup">No account yet? Sign up here</a>
+  </div>
+  <div class="card hide" id="reg">
+    <h3 style="font-size:17px;margin-bottom:10px">Create a new account</h3>
+    <input id="rem" type="email" placeholder="Email" autocomplete="email">
+    <div class="pw"><input id="rpw" type="password" placeholder="Password (min 6 characters)" autocomplete="new-password"><button type="button" class="eye" aria-label="Show password"></button></div>
+    <div class="pw"><input id="rpw2" type="password" placeholder="Re-enter password" autocomplete="new-password"><button type="button" class="eye" aria-label="Show password"></button></div>
+    <div id="err2" class="err"></div>
+    <button class="wide" id="bup">Sign up</button>
+    <a class="lnk" href="#login">Already have an account? Log in</a>
+  </div>
+  <div class="pb">Powered by <b>Khair</b></div>
+</div></section>
+
+<main id="app" class="hide"><div class="wrap">
+  <header><div><div id="clk">--:--:--</div><div id="dt"></div></div><button class="ghost" id="out">Log out</button></header>
+
+  <div id="t-home">
+    <div class="card hero"><div class="lbl">Balance this month</div><div class="big" id="bal">RM 0.00</div>
+      <div class="lbl" id="balsub"></div></div>
+    <div class="card"><div class="q" id="qt"></div><button class="ghost" id="qn" style="margin-top:10px">Another quote</button></div>
+    <div class="g2"><div class="card"><div class="lbl">Spent today</div><div class="amt" id="s-day">RM 0.00</div></div>
+    <div class="card"><div class="lbl">Spent this week</div><div class="amt" id="s-wk">RM 0.00</div></div></div>
+    <div class="card"><h3>Debts coming due</h3><div id="h-debts"></div></div>
+    <div class="card"><h3>Savings</h3><div id="h-sav"></div></div>
+  </div>
+
+  <div id="t-inc" class="hide"><h2>Income</h2>
+    <div class="card"><details><summary>+ Add income</summary>
+      <form id="f-inc">
+        <select id="i-type"><option value="salary">Monthly salary</option><option value="hourly">Part time (per hour)</option><option value="daily">Part time (per day)</option><option value="business">Monthly business</option></select>
+        <input id="i-name" placeholder="Name / source (e.g. Shop, Salary)" required>
+        <div class="g2" id="i-qwrap" style="display:none"><input id="i-qty" type="number" step="0.01" min="0" placeholder="Hours / days"><div></div></div>
+        <input id="i-amt" type="number" step="0.01" min="0" placeholder="Amount (RM)" required>
+        <input id="i-date" type="date" required>
+        <div class="lbl" id="i-tot" style="margin-bottom:8px"></div>
+        <button class="wide">Save</button></form></details></div>
+    <div class="card" id="l-inc"></div></div>
+
+  <div id="t-exp" class="hide"><h2>Spending</h2>
+    <div class="card"><details open><summary>+ Add spending</summary>
+      <form id="f-exp">
+        <input id="e-name" placeholder="What did you spend on?" required>
+        <input id="e-amt" type="number" step="0.01" min="0" placeholder="How much (RM)?" required>
+        <select id="e-cat"><option>Food</option><option>Fuel / Transport</option><option>Bills</option><option>Shopping</option><option>Entertainment</option><option>Other</option></select>
+        <input id="e-date" type="date" required>
+        <button class="wide">Save</button></form></details></div>
+    <div class="card" id="l-exp"></div></div>
+
+  <div id="t-debt" class="hide"><h2>Debts</h2>
+    <div class="card"><details><summary>+ Add debt</summary>
+      <form id="f-debt">
+        <select id="d-type"><option value="monthly">Fixed monthly</option><option value="once">Unexpected (one-time)</option></select>
+        <input id="d-name" placeholder="What debt / owed to whom?" required>
+        <input id="d-amt" type="number" step="0.01" min="0" placeholder="Amount (RM)" required>
+        <input id="d-day" type="number" min="1" max="31" placeholder="Due day of each month (1-31)">
+        <input id="d-due" type="date" class="hide">
+        <button class="wide">Save</button></form></details></div>
+    <div class="card" id="l-debt"></div></div>
+
+  <div id="t-sav" class="hide"><h2>Savings</h2>
+    <div class="card"><details><summary>+ New savings pot</summary>
+      <form id="f-sav">
+        <input id="s-name" placeholder="Pot name (e.g. Emergency)" required>
+        <input id="s-tgt" type="number" step="0.01" min="1" placeholder="Target (RM)" required>
+        <button class="wide">Save</button></form></details></div>
+    <div id="l-sav"></div></div>
+  <div class="pb">Powered by <b>Khair</b></div>
+</div>
+
+<nav>
+  <button data-tab="home" class="on"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-7 8 7v8H3z"/></svg>Home</button>
+  <button data-tab="inc"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 18V5M5 11l6-6 6 6"/></svg>Income</button>
+  <button data-tab="exp"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4v13M5 11l6 6 6-6"/></svg>Spending</button>
+  <button data-tab="debt"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M11 6v5l3 2"/></svg>Debts</button>
+  <button data-tab="sav"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="16" height="11" rx="3"/><path d="M8 7V5h6v2"/></svg>Savings</button>
+</nav>
+</main>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,addDoc,deleteDoc,doc,updateDoc,onSnapshot} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app=initializeApp({apiKey:"AIzaSyDltOc7j4kLWluPwrdX8Nn-jYEOdx9QQ6g",authDomain:"claude-khair-financial.firebaseapp.com",projectId:"claude-khair-financial",storageBucket:"claude-khair-financial.firebasestorage.app",messagingSenderId:"1015054072510",appId:"1:1015054072510:web:341851bc6c116f4b4cbcef"});
+const auth=getAuth(app),db=getFirestore(app);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const rm=n=>"RM "+Number(n||0).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
+const iso=d=>d.toLocaleDateString("sv");
+const S={income:[],expenses:[],debts:[],savings:[]};
+let uid=null,unsubs=[],qOff=0;
+
+/* Add more quotes here to grow the list toward 300 */
+const Q=["Spend less than you earn. Everything else is detail.","A budget is permission to spend, not a restriction.","Small leaks sink big ships.","Pay yourself first.","Wealth is built quietly.","Debts are promises your future self has to keep.","Track it, or it tracks you.","Save the raise before you meet it.","Discipline today, freedom later.","Cash flow is the pulse of your life.","Buy time, not clutter.","Cheap habits compound too.","Consistency beats intensity.","Tell your money where to go instead of wondering where it went.","Frugal is a skill. Generous is the goal.","An emergency fund is peace of mind with interest.","Savings are a need, not a leftover.","Every ringgit has a job.","Debt-free is the new luxury.","Look after the sen and the ringgit looks after itself.","Today's small yes is tomorrow's big no.","Income grows by skill. Wealth grows by habit.","Never confuse a price with a value.","Pay on time. Sleep well.","Your savings rate matters more than your salary.","Delay the purchase, keep the money.","Money is a tool. Build something with it.","The best time to start saving was yesterday. The next best is now.","Small steps, steady stack.","Wealth whispers. Spending shouts.","Know your numbers, know your freedom.","Interest is either your servant or your master.","Be patient with money. It rewards the calm.","Build the base before you chase the peak.","A quiet month is a rich month.","Earn with effort, keep with discipline.","Plan the week, own the month.","What you track, you improve.","Freedom is a full savings jar.","Spend on what you will still value next year."];
+
+/* Logo: K whose upper arm becomes a rising arrow */
+const LOGO=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2d9a0"/><stop offset="1" stop-color="#b8903f"/></linearGradient></defs><rect width="100" height="100" rx="22" fill="#0d110f"/><rect x="2" y="2" width="96" height="96" rx="20" fill="none" stroke="#33402f" stroke-width="2"/><g fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M32 24v52"/><path d="M34 52l34 26"/><path d="M34 52l32-26"/><path d="M52 24h17v17"/></g></svg>`;
+$("#logo").innerHTML=LOGO;
+(()=>{const u="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(LOGO),im=new Image();
+ im.onload=()=>{const c=document.createElement("canvas");c.width=c.height=180;c.getContext("2d").drawImage(im,0,0,180,180);const p=c.toDataURL("image/png");
+  for(const r of["apple-touch-icon","icon"]){const l=document.createElement("link");l.rel=r;l.href=p;document.head.appendChild(l)}};im.src=u})();
+
+/* Clock */
+const tick=()=>{const n=new Date();$("#clk").textContent=n.toLocaleTimeString("en-MY",{hour12:false});$("#dt").textContent=n.toLocaleDateString("en-MY",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
+setInterval(tick,1000);tick();
+
+/* Auth */
+const errMap={"auth/invalid-credential":"Wrong email or password.","auth/invalid-email":"That email format isn't valid.","auth/email-already-in-use":"This email is already registered. Try logging in.","auth/weak-password":"Password is too short (min 6 characters).","auth/missing-password":"Enter your password.","auth/too-many-requests":"Too many attempts. Wait a moment.","auth/network-request-failed":"No internet connection.","auth/operation-not-allowed":"Email/Password sign-in isn't enabled in Firebase Authentication.","auth/unauthorized-domain":"This domain hasn't been added to Firebase Authorized domains."};
+const say=(e,ok,id="#err")=>{const el=$(id);el.style.color=ok?"var(--grn)":"var(--red)";el.textContent=typeof e==="string"?e:(errMap[e.code]||"Error: "+e.code)};
+$("#bin").onclick=()=>signInWithEmailAndPassword(auth,$("#em").value.trim(),$("#pw").value).catch(e=>say(e));
+$("#bup").onclick=()=>{const e=$("#rem").value.trim(),p=$("#rpw").value;
+ if(!e)return say("Enter your email first.",0,"#err2");
+ if(p.length<6)return say("Password is too short (min 6 characters).",0,"#err2");
+ if(p!==$("#rpw2").value)return say("Passwords do not match.",0,"#err2");
+ createUserWithEmailAndPassword(auth,e,p).catch(x=>say(x,0,"#err2"))};
+/* Eye buttons: show / hide password */
+const EYE='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYEOFF='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/></svg>';
+document.querySelectorAll(".eye").forEach(b=>{const i=b.previousElementSibling;b.innerHTML=EYE;
+ b.onclick=()=>{const show=i.type==="password";i.type=show?"text":"password";b.innerHTML=show?EYEOFF:EYE;b.setAttribute("aria-label",show?"Hide password":"Show password")}});
+/* Separate register screen via #signup */
+const route=()=>{const r=location.hash==="#signup";$("#login").classList.toggle("hide",r);$("#reg").classList.toggle("hide",!r);$("#err").textContent="";$("#err2").textContent="";scrollTo(0,0)};
+addEventListener("hashchange",route);
+$("#brs").onclick=()=>{const e=$("#em").value.trim();if(!e)return say("Enter your email first.");sendPasswordResetEmail(auth,e).then(()=>say("Reset email sent. Check your inbox.",1)).catch(say)};
+$("#out").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,u=>{unsubs.forEach(f=>f());unsubs=[];
+ if(u){uid=u.uid;$("#auth").classList.add("hide");$("#app").classList.remove("hide");if(location.hash)history.replaceState(null,"",location.pathname);
+  for(const n of Object.keys(S))unsubs.push(onSnapshot(collection(db,"users",uid,n),s=>{S[n]=s.docs.map(d=>({id:d.id,...d.data()}));render()},e=>console.error(n,e)));}
+ else{uid=null;Object.keys(S).forEach(k=>S[k]=[]);$("#app").classList.add("hide");$("#auth").classList.remove("hide");route()}});
+
+/* Tabs */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+ document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+ for(const t of["home","inc","exp","debt","sav"])$("#t-"+t).classList.toggle("hide",t!==b.dataset.tab);scrollTo(0,0)});
+
+/* Helpers for debts */
+const now=()=>new Date(),ymNow=()=>iso(now()).slice(0,7);
+const dueOf=d=>{if(d.type==="once")return new Date(d.due+"T00:00:00");const n=now(),last=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();return new Date(n.getFullYear(),n.getMonth(),Math.min(+d.day,last))};
+const paid=d=>d.type==="once"?!!d.paid:d.paidMonth===ymNow();
+const daysTo=d=>{const t=new Date();t.setHours(0,0,0,0);return Math.round((dueOf(d)-t)/864e5)};
+const badge=d=>{if(paid(d))return'<span class="pill p-g">Paid</span>';const n=daysTo(d);return n<0?`<span class="pill p-r">${-n}d late</span>`:n<=3?`<span class="pill p-y">${n===0?"Today":n+"d left"}</span>`:`<span class="pill p-g">${n}d left</span>`};
+const dueTxt=d=>dueOf(d).toLocaleDateString("en-MY",{day:"numeric",month:"short"});
+
+/* Render */
+const sum=a=>a.reduce((s,x)=>s+(+x.amount||0),0);
+const del=(c,id)=>`<button class="x" data-a="del" data-c="${c}" data-id="${id}" aria-label="Delete">✕</button>`;
+function render(){
+ const ym=ymNow(),td=iso(now()),wk=iso(new Date(Date.now()-6*864e5));
+ const inc=S.income.filter(x=>x.date.slice(0,7)===ym),exp=S.expenses.filter(x=>x.date.slice(0,7)===ym);
+ const unpaid=S.debts.filter(d=>!paid(d));
+ const bal=sum(inc)-sum(exp)-sum(unpaid);
+ $("#bal").textContent=rm(bal);$("#bal").style.color=bal<0?"var(--red)":"var(--gold)";
+ $("#balsub").textContent=`In ${rm(sum(inc))} · Spent ${rm(sum(exp))} · Unpaid debts ${rm(sum(unpaid))}`;
+ $("#s-day").textContent=rm(sum(S.expenses.filter(x=>x.date===td)));
+ $("#s-wk").textContent=rm(sum(S.expenses.filter(x=>x.date>=wk&&x.date<=td)));
+ const up=[...unpaid].sort((a,b)=>dueOf(a)-dueOf(b)).slice(0,4);
+ $("#h-debts").innerHTML=up.length?up.map(d=>`<div class="row"><div><b>${esc(d.name)}</b>${badge(d)}<small>${dueTxt(d)}</small></div><div class="amt">${rm(d.amount)}</div></div>`).join(""):'<div class="empty">No unpaid debts.</div>';
+ $("#h-sav").innerHTML=S.savings.length?S.savings.map(s=>{const p=Math.min(100,(s.saved||0)/s.target*100);return`<div style="margin-bottom:10px"><div class="row" style="border:0;padding:0"><b>${esc(s.name)}</b><span class="lbl">${rm(s.saved||0)} / ${rm(s.target)}</span></div><div class="bar"><i style="width:${p}%"></i></div></div>`}).join(""):'<div class="empty">No savings pots yet. Create one in the Savings tab.</div>';
+ const byDate=(a,b)=>b.date.localeCompare(a.date);
+ $("#l-inc").innerHTML=S.income.length?[...S.income].sort(byDate).map(x=>`<div class="row"><div><b>${esc(x.name)}</b><small>${{salary:"Salary",hourly:"Hourly",daily:"Daily",business:"Business"}[x.type]}${x.qty?` · ${x.qty} × ${rm(x.rate)}`:""} · ${x.date}</small></div><div style="display:flex;align-items:center"><span class="amt pos">+${rm(x.amount)}</span>${del("income",x.id)}</div></div>`).join(""):'<div class="empty">No income recorded yet.</div>';
+ $("#l-exp").innerHTML=S.expenses.length?[...S.expenses].sort(byDate).slice(0,60).map(x=>`<div class="row"><div><b>${esc(x.name)}</b><small>${esc(x.cat||"")} · ${x.date}</small></div><div style="display:flex;align-items:center"><span class="amt neg">−${rm(x.amount)}</span>${del("expenses",x.id)}</div></div>`).join(""):'<div class="empty">No spending recorded yet.</div>';
+ const dl=[...S.debts].sort((a,b)=>paid(a)-paid(b)||dueOf(a)-dueOf(b));
+ $("#l-debt").innerHTML=dl.length?dl.map(d=>`<div class="row"><div><b>${esc(d.name)}</b>${badge(d)}<small>${d.type==="once"?"Unexpected":"Monthly"} · due ${dueTxt(d)}</small></div><div style="display:flex;align-items:center;gap:4px"><span class="amt">${rm(d.amount)}</span><button class="ghost" data-a="pay" data-id="${d.id}">${paid(d)?"Undo":"Pay"}</button>${del("debts",d.id)}</div></div>`).join(""):'<div class="empty">No debts. Nice.</div>';
+ $("#l-sav").innerHTML=S.savings.length?S.savings.map(s=>{const p=Math.min(100,(s.saved||0)/s.target*100);return`<div class="card"><div class="row" style="border:0;padding:0"><b>${esc(s.name)}</b>${del("savings",s.id)}</div><div class="amt" style="margin-top:4px">${rm(s.saved||0)} <span class="lbl">/ ${rm(s.target)}</span></div><div class="bar"><i style="width:${p}%"></i></div><div class="g2" style="margin-top:10px"><button class="ghost" data-a="sv" data-s="1" data-id="${s.id}">+ Add</button><button class="ghost" data-a="sv" data-s="-1" data-id="${s.id}">− Withdraw</button></div></div>`}).join(""):'<div class="card empty">No savings pots yet.</div>';
+}
+const pickQ=()=>{$("#qt").textContent="“"+Q[(Math.floor(Date.now()/864e5)+qOff)%Q.length]+"”"};
+$("#qn").onclick=()=>{qOff=Math.floor(Math.random()*Q.length);pickQ()};pickQ();
+
+/* Actions */
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b||!uid)return;const{a,c,id}=b.dataset;
+ try{
+ if(a==="del"&&confirm("Delete this record?"))await deleteDoc(doc(db,"users",uid,c,id));
+ if(a==="pay"){const d=S.debts.find(x=>x.id===id),p=paid(d);await updateDoc(doc(db,"users",uid,"debts",id),d.type==="once"?{paid:!p}:{paidMonth:p?"":ymNow()})}
+ if(a==="sv"){const s=S.savings.find(x=>x.id===id),v=parseFloat(prompt(b.dataset.s==="1"?"Add how much (RM)?":"Withdraw how much (RM)?"));
+  if(v>0)await updateDoc(doc(db,"users",uid,"savings",id),{saved:Math.max(0,(s.saved||0)+v*b.dataset.s)})}
+ }catch(err){alert("Failed: "+err.code+". Check your Firestore rules.")}});
+
+const add=(col,data)=>addDoc(collection(db,"users",uid,col),data).catch(err=>alert("Failed to save: "+err.code+". Check your Firestore rules."));
+const t0=iso(now());["#i-date","#e-date"].forEach(s=>$(s).value=t0);
+const typeI=$("#i-type");
+const incUI=()=>{const h=typeI.value==="hourly"||typeI.value==="daily";$("#i-qwrap").style.display=h?"grid":"none";$("#i-qty").required=h;
+ $("#i-amt").placeholder=h?`Rate per ${typeI.value==="hourly"?"hour":"day"} (RM)`:"Amount (RM)";tot()};
+const tot=()=>{const q=+$("#i-qty").value,r=+$("#i-amt").value,h=typeI.value!=="salary"&&typeI.value!=="business";$("#i-tot").textContent=h&&q&&r?`Total: ${q} × ${rm(r)} = ${rm(q*r)}`:""};
+typeI.onchange=incUI;$("#i-qty").oninput=tot;$("#i-amt").oninput=tot;
+$("#f-inc").onsubmit=async e=>{e.preventDefault();const t=typeI.value,h=t==="hourly"||t==="daily",q=+$("#i-qty").value,r=+$("#i-amt").value;
+ await add("income",{type:t,name:$("#i-name").value.trim(),date:$("#i-date").value,...(h?{qty:q,rate:r,amount:+(q*r).toFixed(2)}:{amount:r})});
+ e.target.reset();$("#i-date").value=t0;incUI();e.target.closest("details").open=false};
+$("#f-exp").onsubmit=async e=>{e.preventDefault();
+ await add("expenses",{name:$("#e-name").value.trim(),amount:+$("#e-amt").value,cat:$("#e-cat").value,date:$("#e-date").value});
+ e.target.reset();$("#e-date").value=t0};
+const dt=$("#d-type");dt.onchange=()=>{const m=dt.value==="monthly";$("#d-day").classList.toggle("hide",!m);$("#d-due").classList.toggle("hide",m);$("#d-day").required=m;$("#d-due").required=!m};dt.onchange();
+$("#f-debt").onsubmit=async e=>{e.preventDefault();const m=dt.value==="monthly";
+ await add("debts",{type:dt.value,name:$("#d-name").value.trim(),amount:+$("#d-amt").value,...(m?{day:+$("#d-day").value,paidMonth:""}:{due:$("#d-due").value,paid:false})});
+ e.target.reset();dt.onchange();e.target.closest("details").open=false};
+$("#f-sav").onsubmit=async e=>{e.preventDefault();
+ await add("savings",{name:$("#s-name").value.trim(),target:+$("#s-tgt").value,saved:0});e.target.reset();e.target.closest("details").open=false};
+render();
+</script>
+</body>
+</html>
