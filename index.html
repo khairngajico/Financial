@@ -203,7 +203,8 @@ $("#brs").onclick=()=>{const e=$("#em").value.trim();if(!e)return say("Enter you
 $("#out").onclick=()=>signOut(auth);
 onAuthStateChanged(auth,u=>{unsubs.forEach(f=>f());unsubs=[];
  if(u){uid=u.uid;$("#auth").classList.add("hide");$("#app").classList.remove("hide");if(location.hash)history.replaceState(null,"",location.pathname);
-  for(const n of Object.keys(S))unsubs.push(onSnapshot(collection(db,"users",uid,n),s=>{S[n]=s.docs.map(d=>({id:d.id,...d.data()}));render()},e=>console.error(n,e)));}
+  for(const n of Object.keys(S))unsubs.push(onSnapshot(collection(db,"users",uid,n),s=>{S[n]=s.docs.map(d=>{const o={id:d.id,...d.data()};
+    if(n==="expenses"&&!o.date){let t;try{t=d._document.createTime.toTimestamp().toDate()}catch(x){}o.date=iso(t||new Date())}return o});render()},e=>console.error(n,e)));}
  else{uid=null;Object.keys(S).forEach(k=>S[k]=[]);$("#app").classList.add("hide");$("#auth").classList.remove("hide");route()}});
 
 /* Tabs */
