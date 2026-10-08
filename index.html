@@ -144,11 +144,12 @@ nav button.on{background:var(--glow)}
       <form id="f-debt">
         <select id="d-type"><option value="monthly">Fixed monthly</option><option value="once">Unexpected (one-time)</option></select>
         <input id="d-name" placeholder="What debt / owed to whom?" required>
-        <input id="d-amt" type="number" step="0.01" min="0" placeholder="Amount (RM)" required>
+        <input id="d-amt" type="number" step="0.01" min="0" placeholder="Payment amount (RM): monthly instalment or amount due" required><input id="d-tot" type="number" step="0.01" min="0" placeholder="Total debt left (RM), optional"><input id="d-pre" type="number" step="0.01" min="0" placeholder="Already paid before (RM), optional">
         <input id="d-day" type="number" min="1" max="31" placeholder="Due day of each month (1-31)">
         <input id="d-due" type="date" class="hide">
-        <button class="wide">Save</button></form></details></div>
+        <button class="wide">Save</button><button type="button" class="ghost wide hide" id="d-cx" style="margin-top:8px">Cancel edit</button></form></details></div>
     <div class="g2"><div class="card"><div class="lbl">Monthly (unpaid)</div><div class="amt neg" id="dt-m"></div></div><div class="card"><div class="lbl">Unexpected (unpaid)</div><div class="amt neg" id="dt-u"></div></div></div>
+    <button class="ghost wide" id="allb" style="margin-bottom:12px">Manage all debts &amp; payoff plan</button><div class="hide" id="allp"></div>
     <div class="card" id="l-debt"></div>
     <h2 style="margin-top:18px">Payment history</h2><div class="card" id="l-pay"></div></div>
 
@@ -262,7 +263,7 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
  for(const t of["home","inc","exp","debt","sav","adm"])$("#t-"+t).classList.toggle("hide",t!==b.dataset.tab);scrollTo(0,0)});
 
 /* Helpers for debts */
-const now=()=>new Date(),ymNow=()=>iso(now()).slice(0,7),per=d=>d.type==="once"?"once":ymNow();let payId=null;
+const now=()=>new Date(),ymNow=()=>iso(now()).slice(0,7),per=d=>d.type==="once"?"once":ymNow();let payId=null,editId=null;
 const ymOf=t=>t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0");
 const dueIn=(d,k)=>{if(d.type==="once")return new Date(d.due+"T00:00:00");const n=now(),m=n.getMonth()+k,last=new Date(n.getFullYear(),m+1,0).getDate();return new Date(n.getFullYear(),m,Math.min(+d.day,last))};
 const paidIn=(d,pr)=>S.payments.filter(x=>x.debtId===d.id&&x.period===pr).reduce((a,x)=>a+(+x.amount||0),0);
@@ -271,8 +272,12 @@ const cycK=d=>{if(d.type==="once")return 0;for(let k=0;k<3;k++)if(!doneFor(d,k))
 const period=d=>d.type==="once"?"once":ymOf(dueIn(d,cycK(d)));
 const dueOf=d=>dueIn(d,cycK(d));
 const left=d=>Math.max(0,(+d.amount||0)-paidIn(d,period(d)));
-const open=d=>d.type==="once"?!doneFor(d,0):cycK(d)===0||(cycK(d)<3&&daysTo(d)<=14);
+const open=d=>remTot(d)===0?false:d.type==="once"?!doneFor(d,0):cycK(d)===0||(cycK(d)<3&&daysTo(d)<=14);
 const paid=d=>!open(d);
+const allPaid=d=>S.payments.filter(x=>x.debtId===d.id).reduce((a,x)=>a+(+x.amount||0),0)+(+d.prepaid||0);
+const remTot=d=>{if(d.total==null)return null;const r=+d.total-allPaid(d);return r<.005?0:r};
+const plan=d=>{const R=remTot(d);if(R===null)return null;if(R===0)return{done:true};if(d.type==="once")return{once:true,end:dueOf(d)};const a=+d.amount;if(!(a>0))return null;const n=Math.ceil(R/a-1e-9);return{n,end:dueIn(d,Math.min(cycK(d),3)+n-1)}};
+const span=n=>{const y=Math.floor(n/12),m=n%12;return((y?y+" yr ":"")+(m?m+" mo":"")).trim()||"0 mo"};
 const sumL=a=>a.reduce((t,d)=>t+left(d),0);
 const daysTo=d=>{const t=new Date();t.setHours(0,0,0,0);return Math.round((dueOf(d)-t)/864e5)};
 const badge=d=>{if(paid(d))return'<span class="pill p-g">Paid</span>';const n=daysTo(d);return n<0?`<span class="pill p-r">${-n}d late</span>`:n<=3?`<span class="pill p-y">${n===0?"Today":n+"d left"}</span>`:`<span class="pill p-g">${n}d left</span>`};
@@ -286,7 +291,7 @@ function render(){
  const inc=S.income.filter(x=>x.date.slice(0,7)===ym),exp=S.expenses.filter(x=>x.date.slice(0,7)===ym);
  const unpaid=S.debts.filter(d=>!paid(d));
  const sumS=S.savings.reduce((a,x)=>a+(+x.saved||0),0),bal=sum(S.income)-sum(S.expenses)-sum(S.payments)-sumS;
- $("#tdebt").textContent=rm(sumL(unpaid));$("#tsav").textContent=rm(sumS);
+ $("#tdebt").textContent=rm(S.debts.reduce((t,d)=>t+(d.total!=null?(remTot(d)||0):(open(d)?left(d):0)),0));$("#tsav").textContent=rm(sumS);
  $("#bal").textContent=rm(bal);$("#bal").style.color=bal<0?"var(--red)":"var(--gold)";
  $("#balsub").textContent=`This month · In ${rm(sum(inc))} · Spent ${rm(sum(exp))} · Unpaid debts ${rm(sumL(unpaid))}`;
  $("#s-day").textContent=rm(sum(S.expenses.filter(x=>x.date===td)));
@@ -297,6 +302,10 @@ function render(){
  $("#dt-m").textContent=rm(sumL(unpaid.filter(d=>d.type==="monthly")));$("#dt-u").textContent=rm(sumL(unpaid.filter(d=>d.type==="once")));
  const fdt=v=>new Date(v).toLocaleString("en-MY",{day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"});
  $("#l-pay").innerHTML=S.payments.length?[...S.payments].sort((a,b)=>b.paidAt.localeCompare(a.paidAt)).map(p=>`<div class="row"><div><b>${esc(p.name)}</b><small>${p.type==="once"?"Unexpected":"Monthly"} · ${fdt(p.paidAt)}</small></div><div style="display:flex;align-items:center;gap:6px"><span class="amt pos">${rm(p.amount)}</span>${p.proof?`<button class="ghost" data-a="proof" data-id="${p.id}">Proof</button>`:""}<button class="x" data-a="undo" data-id="${p.id}">Undo</button></div></div>`).join(""):'<div class="empty">No payments yet. Paid debts will appear here.</div>';
+ const fm=t=>t.toLocaleDateString("en-MY",{month:"short",year:"numeric"});
+ $("#allp").innerHTML=S.debts.length?[...S.debts].sort((a,b)=>a.name.localeCompare(b.name)).map(d=>{const R=remTot(d),pl=plan(d),pd=allPaid(d),pct=d.total>0?Math.min(100,pd/d.total*100):0;
+  const note=pl?(pl.done?"Settled":pl.once?"due "+dueTxt(d):"about "+span(pl.n)+" left · ends "+fm(pl.end)):"";
+  return`<div class="card"><div class="row" style="border:0;padding:0"><b>${esc(d.name)}</b><span class="lbl">${d.type==="once"?"Unexpected":"Monthly"}</span></div>${d.total==null?'<div class="empty">No total set. Tap Edit and add the total debt to see the payoff plan.</div>':`<div class="amt" style="margin-top:6px">${rm(R)} <span class="lbl">left of ${rm(d.total)}</span></div><div class="bar"><i style="width:${pct}%"></i></div><div class="lbl">Paid ${rm(pd)}${d.type==="once"?"":" · "+rm(d.amount)+"/month"}${note?" · "+note:""}</div>`}<div class="g2" style="margin-top:10px"><button class="ghost" data-a="dedit" data-id="${d.id}">Edit</button><button class="ghost" data-a="ddel" data-id="${d.id}">Delete</button></div></div>`}).join(""):'<div class="card empty">No debts yet.</div>';
  const byDate=(a,b)=>b.date.localeCompare(a.date);
  $("#l-inc").innerHTML=S.income.length?[...S.income].sort(byDate).map(x=>`<div class="row"><div><b>${esc(x.name)}</b><small>${{salary:"Salary",hourly:"Hourly",daily:"Daily",business:"Business"}[x.type]}${x.qty?` · ${x.qty} × ${rm(x.rate)}`:""} · ${x.date}</small></div><div style="display:flex;align-items:center"><span class="amt pos">+${rm(x.amount)}</span>${del("income",x.id)}</div></div>`).join(""):'<div class="empty">No income recorded yet.</div>';
  $("#l-exp").innerHTML=S.expenses.length?[...S.expenses].sort(byDate).slice(0,60).map(x=>`<div class="row"><div><b>${esc(x.name)}</b><small>${esc(x.cat||"")} · ${x.date}${x.time?" · "+x.time:""}</small></div><div style="display:flex;align-items:center"><span class="amt neg">−${rm(x.amount)}</span>${del("expenses",x.id)}</div></div>`).join(""):'<div class="empty">No spending recorded yet.</div>';
@@ -312,6 +321,8 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
  try{
  if(a==="del"&&confirm("Delete this record?"))await deleteDoc(doc(db,"users",uid,c,id));
  if(a==="pay"){const d=S.debts.find(x=>x.id===id);payId=id;$("#pt").textContent="Pay "+d.name+" · left "+rm(left(d));$("#pa").value=left(d).toFixed(2);$("#pf").value="";$("#pm").classList.remove("hide")}
+ if(a==="dedit"){const d=S.debts.find(x=>x.id===id);editId=id;dt.value=d.type;dt.onchange();$("#d-name").value=d.name;$("#d-amt").value=d.amount;$("#d-tot").value=d.total==null?"":d.total;$("#d-pre").value=d.prepaid||"";$("#d-day").value=d.day||"";$("#d-due").value=d.due||"";$("#d-cx").classList.remove("hide");const dd=$("#f-debt").closest("details");dd.open=true;dd.scrollIntoView({behavior:"smooth"})}
+ if(a==="ddel"&&confirm("Delete this debt? Its payment history stays."))await deleteDoc(doc(db,"users",uid,"debts",id));
  if(a==="undo"&&confirm("Undo this payment?"))await deleteDoc(doc(db,"users",uid,"payments",id));
  if(a==="proof"){$("#ovi").src=S.payments.find(x=>x.id===id).proof;$("#ov").classList.remove("hide")}
  if(a==="sv"){const s=S.savings.find(x=>x.id===id),v=parseFloat(prompt(b.dataset.s==="1"?"Add how much (RM)?":"Withdraw how much (RM)?"));
@@ -332,9 +343,12 @@ $("#f-exp").onsubmit=async e=>{e.preventDefault();
  await add("expenses",{name:$("#e-name").value.trim(),amount:+$("#e-amt").value,cat:$("#e-cat").value,date:$("#e-date").value});
  e.target.reset();$("#e-date").value=t0};
 const dt=$("#d-type");dt.onchange=()=>{const m=dt.value==="monthly";$("#d-day").classList.toggle("hide",!m);$("#d-due").classList.toggle("hide",m);$("#d-day").required=m;$("#d-due").required=!m};dt.onchange();
-$("#f-debt").onsubmit=async e=>{e.preventDefault();const m=dt.value==="monthly";
- await add("debts",{type:dt.value,name:$("#d-name").value.trim(),amount:+$("#d-amt").value,...(m?{day:+$("#d-day").value,paidMonth:""}:{due:$("#d-due").value,paid:false})});
- e.target.reset();dt.onchange();e.target.closest("details").open=false};
+$("#f-debt").onsubmit=async e=>{e.preventDefault();const m=dt.value==="monthly",amt=+$("#d-amt").value,tot=$("#d-tot").value===""?(m?null:amt):+$("#d-tot").value;
+ const data={type:dt.value,name:$("#d-name").value.trim(),amount:amt,total:tot,prepaid:+$("#d-pre").value||0,...(m?{day:+$("#d-day").value}:{due:$("#d-due").value})};
+ if(editId){try{await updateDoc(doc(db,"users",uid,"debts",editId),data)}catch(x){alert("Failed: "+x.code)}}else await add("debts",{...data,...(m?{paidMonth:""}:{paid:false})});
+ editId=null;$("#d-cx").classList.add("hide");e.target.reset();dt.onchange();e.target.closest("details").open=false};
+$("#d-cx").onclick=()=>{editId=null;$("#f-debt").reset();dt.onchange();$("#d-cx").classList.add("hide")};
+$("#allb").onclick=()=>$("#allp").classList.toggle("hide");
 $("#f-sav").onsubmit=async e=>{e.preventDefault();
  await add("savings",{name:$("#s-name").value.trim(),target:+$("#s-tgt").value,saved:0});e.target.reset();e.target.closest("details").open=false};
 const shrink=f=>new Promise(r=>{if(!f)return r("");const im=new Image,u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);r(c.toDataURL("image/jpeg",.6))};im.onerror=()=>r("");im.src=u});
