@@ -75,6 +75,7 @@ nav .fab{width:64px;height:64px;border-radius:50%;margin:-36px auto 0;padding:0;
 nav .fab.on{transform:scale(1.08);background:linear-gradient(135deg,var(--gold2),var(--gold))}
 nav .fab svg{margin:0}
 .hi{color:var(--mu);font-size:13px}.gname{font:700 30px/1.15 Fraunces,serif;margin:2px 0 12px}
+.ghead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}.ghead .gname{margin-bottom:0}.gclock{text-align:right;flex-shrink:0}#clk{font-size:26px!important}#dt{font-size:12px!important;margin-top:4px}
 .empty{color:var(--mu);padding:8px 0}
 @media(prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
@@ -110,10 +111,10 @@ nav .fab svg{margin:0}
   <div class="pb">Powered by <b>Khair</b></div></div></section>
 
 <main id="app" class="hide"><div class="wrap">
-  <header><div><div id="clk">--:--:--</div><div id="dt"></div><div id="lic" style="display:none"></div></div></header>
+  <div id="lic" style="display:none"></div>
 
   <div id="t-home">
-    <div class="hi" id="gr-hi">Hello</div><div class="gname" id="gr-name">Welcome</div>
+    <div class="ghead"><div><div class="hi" id="gr-hi">Hello</div><div class="gname" id="gr-name">Welcome</div></div><div class="gclock"><div id="clk">--:--:--</div><div id="dt"></div></div></div>
     <div class="card"><div class="q" id="qt"></div></div>
     <div class="card hero"><div class="lbl">Money you have now</div><div class="big" id="bal">RM 0.00</div>
       <div class="lbl" id="balsub"></div></div>
@@ -227,7 +228,7 @@ $("#logo").innerHTML=LOGO;
   for(const r of["apple-touch-icon","icon"]){const l=document.createElement("link");l.rel=r;l.href=p;document.head.appendChild(l)}};im.src=u})();
 
 /* Clock */
-const tick=()=>{const n=new Date();$("#clk").textContent=n.toLocaleTimeString("en-MY",{hour12:false});$("#dt").textContent=n.toLocaleDateString("en-MY",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
+const tick=()=>{const n=new Date();$("#clk").textContent=n.toLocaleTimeString("en-MY",{hour12:false});$("#dt").textContent=n.toLocaleDateString("en-MY",{weekday:"short",day:"numeric",month:"short",year:"numeric"})};
 setInterval(tick,1000);tick();
 
 /* Auth */
