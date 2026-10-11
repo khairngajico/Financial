@@ -91,6 +91,14 @@ nav .fab svg{margin:0}
 #qt{color:var(--mu);font-size:15px;line-height:1.5;margin:0 2px 18px}
 #t-home .card{border-radius:24px;padding:18px}#t-home .hero{padding:24px 22px}#t-home .hero .big{font-size:46px;margin:6px 0}
 #t-home .g2{gap:12px}#t-home .g2 .card{padding:16px 18px}
+/* keep every page locked to the screen width: no sideways drift, UI stays centred */
+html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none}
+body{touch-action:pan-y pinch-zoom}
+.wrap{width:100%;overflow-x:hidden}
+.row>div:first-child{min-width:0;flex:1}.row b,.row small{overflow-wrap:anywhere}
+input,select,textarea{max-width:100%;min-width:0}
+input[type=date]{-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:0;text-align:left}
+nav{left:0!important;right:0!important;margin:0 auto!important;transform:none!important}
 .empty{color:var(--mu);padding:8px 0}
 @media(prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
